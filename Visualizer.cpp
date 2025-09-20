@@ -1,7 +1,7 @@
 #include "Visualizer.h"
 #include <stdexcept>
 
-Visualizer::Visualizer(int width, int height)
+Visualizer::Visualizer(int width, int height, float r, float g, float b, float alpha)
 {
     //Initialize glfw
     glfwInit();
@@ -97,6 +97,11 @@ const char *fragmentShaderSource = "#version 330 core\n"
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    backgroundColor[0] = r;
+    backgroundColor[1] = g;
+    backgroundColor[2] = b;
+    backgroundColor[3] = alpha;
+
 }
 
 bool Visualizer::render()
@@ -111,7 +116,7 @@ bool Visualizer::render()
     //if window isn't going to close, render the window
     glfwPollEvents();
 
-    glClearColor(0.2f,0.3f,0.3f,1.0f);//R,G,B,Alpha-how transparent it is
+    glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
