@@ -16,7 +16,7 @@ Visualizer::Visualizer(int width, int height)
     //make sure window is created
     if(window == NULL){
         glfwTerminate();
-        std::cout << "COOKEd";
+        std::cout << "COOKED";
         //throw std::system_error("Error initializing window. Check system configurations and libraries");
     }
 
@@ -27,6 +27,76 @@ Visualizer::Visualizer(int width, int height)
         std::cout << "Cooked";
         //throw std::system_error("Error initializing GLAD. Check system configurations and libraries");
     }
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f, // Bottom-left vertex
+        0.5f, -0.5f, 0.0f, // Bottom-right vertex
+        0.0f,  0.5f, 0.0f // Top-middle vertex
+    };
+
+    //Set up VAO
+    //VAO is configuration data
+    //Since we only use one configuration, we only generate 1 VAO
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    //VBO is where the actual data is stored
+    //we only have one location for the data, vertices, so we only generate on VBO
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //store the data-Static Draw is a way to draw the object, there are other ways depending on if it changes a lot or not
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //we tell OpenGL how to interpret the data
+    //First value is location of the vertex attributes. IDK what this means
+    //Second value is number of components per vertex. 3 because (x,y,z) even though z = 0 for all points
+    //Third value is type of the data
+    //Ignore 4th argument-always false
+    //Fifth value is stride length for each vertex. Because each vertex has 3 components, and each component is the size of a float, the stride length is 3 * sizeof(float)
+    //Sixth value is offset of the first component.
+    glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 3*sizeof(float),(void*)0);
+    glEnableVertexAttribArray(0);
+
+    //Unbind VAO and VBO to prevent accidental changes
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    const char *vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\n\0";
+
+    //create shaders
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    //link shaders
+    shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+
+    glLinkProgram(shaderProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
 }
 
 bool Visualizer::render()
@@ -43,6 +113,10 @@ bool Visualizer::render()
 
     glClearColor(0.2f,0.3f,0.3f,1.0f);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES,0 , 3);
 
     //swap buffers
     glfwSwapBuffers(window);

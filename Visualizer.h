@@ -12,6 +12,8 @@ class Visualizer
         bool render();
     private:
         GLFWwindow* window;
+        unsigned int VBO, VAO;
+        unsigned int shaderProgram;
 };
 
 #endif
