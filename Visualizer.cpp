@@ -1,7 +1,7 @@
 #include "Visualizer.h"
 #include <stdexcept>
 
-Visualizer::Visualizer(int width, int height, float r, float g, float b, float alpha)
+Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 {
     //Initialize glfw
     glfwInit();
@@ -68,12 +68,18 @@ Visualizer::Visualizer(int width, int height, float r, float g, float b, float a
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
-const char *fragmentShaderSource = "#version 330 core\n"
+    std::string fss = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "   FragColor = vec4(" + 
+    std::to_string(oColor[0]) + "f, " +
+    std::to_string(oColor[1]) + "f, " +
+    std::to_string(oColor[2]) + "f, " +
+    std::to_string(oColor[3]) + "f);\n" +
     "}\n\0";
+
+    const char *fragmentShaderSource = fss.c_str();
 
     //create shaders
     unsigned int vertexShader;
@@ -97,10 +103,8 @@ const char *fragmentShaderSource = "#version 330 core\n"
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    backgroundColor[0] = r;
-    backgroundColor[1] = g;
-    backgroundColor[2] = b;
-    backgroundColor[3] = alpha;
+    //set background color
+    backgroundColor = bgColor;
 
 }
 
@@ -116,9 +120,11 @@ bool Visualizer::render()
     //if window isn't going to close, render the window
     glfwPollEvents();
 
+    //set background
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
+    //draw triangle
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES,0 , 3);
