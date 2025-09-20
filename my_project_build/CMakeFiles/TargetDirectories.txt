@@ -1,0 +1,3 @@
+/Users/sanjay/Desktop/Open_GL/my_project_build/CMakeFiles/LearnOpenGL.dir
+/Users/sanjay/Desktop/Open_GL/my_project_build/CMakeFiles/edit_cache.dir
+/Users/sanjay/Desktop/Open_GL/my_project_build/CMakeFiles/rebuild_cache.dir

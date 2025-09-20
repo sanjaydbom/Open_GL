@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/sanjay/Desktop/Open_GL/build/cmake_install.cmake",
+		"/Users/sanjay/Desktop/Open_GL/build/src/cmake_install.cmake",
+		"/Users/sanjay/Desktop/Open_GL/build/tests/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
