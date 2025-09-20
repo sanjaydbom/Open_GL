@@ -45,7 +45,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     //store the data-Static Draw is a way to draw the object, there are other ways depending on if it changes a lot or not
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
     //we tell OpenGL how to interpret the data
     //First value is location of the vertex attributes. IDK what this means
@@ -58,7 +58,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     glEnableVertexAttribArray(0);
 
     //Unbind VAO and VBO to prevent accidental changes
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     const char *vertexShaderSource = "#version 330 core\n"
@@ -108,7 +108,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 
 }
 
-bool Visualizer::render()
+bool Visualizer::render(const float* vertices, const int size)
 {
     //std::cout << "Working\n";
     //check if window should be closed
@@ -124,10 +124,11 @@ bool Visualizer::render()
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size, vertices);
     //draw triangle
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES,0 , 3);
+    glDrawArrays(GL_TRIANGLES, 0 , 3);
 
     //swap buffers
     glfwSwapBuffers(window);
