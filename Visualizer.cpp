@@ -4,7 +4,7 @@
 #include <cmath>
 #include <numbers>
 
-Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int m_precision, int m_num_circles) : precision(m_precision), numCircles(m_num_circles)
+Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int m_precision, int m_num_circles, std::string title) : precision(m_precision), numCircles(m_num_circles)
 {
     //Initialize glfw
     glfwInit();
@@ -15,7 +15,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //create window
-    window = glfwCreateWindow(width, height, "My OpenGL Window", NULL, NULL);
+    window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
     //make sure window is created
     if(window == NULL){
         glfwTerminate();

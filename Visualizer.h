@@ -8,7 +8,7 @@
 class Visualizer
 {
     public:
-        Visualizer(int width = 800, int height = 600, float* bgColor = nullptr, float* oColor = nullptr, int m_precision = 50, int m_num_circles = 1);
+        Visualizer(int width = 800, int height = 600, float* bgColor = nullptr, float* oColor = nullptr, int m_precision = 50, int m_num_circles = 1, std::string title = "My OpenGL Window");
         bool render(const float* centers, const float* radii);
     private:
         void make_circle(const float* center, float* vertices, int* order, const float radius, const int offset);
