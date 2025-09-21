@@ -6,12 +6,13 @@ int main(){
     Visualizer GUI(800,600,bgColor, oColor);
 
     float center[] = {
-        0.0f, 0.0f, 0.0f // Top-Right vertex
+        0.0f, 0.0f, 0.0f,
+        0.5f, 0.0f, 0.0f // Top-Right vertex
     };
 
 
     std::cout << "Starting rendering\n";
-    while(GUI.render(center));
+    while(GUI.render(center,2));
     std::cout << "Rendering done\n";
     return 0;
 }

@@ -9,8 +9,8 @@ class Visualizer
 {
     public:
         Visualizer(int width = 800, int height = 600, float* bgColor = nullptr, float* oColor = nullptr);
-        bool render(const float* center);
-        void make_circle(const float* center, float* vertices, int* order);
+        bool render(const float* centers, int num_circles);
+        void make_circle(const float* center, float* vertices, int* order, int offset);
     private:
         GLFWwindow* window;
         unsigned int VBO, VAO, EBO;
