@@ -19,8 +19,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int
     //make sure window is created
     if(window == NULL){
         glfwTerminate();
-        std::cout << "COOKED";
-        //throw std::system_error("Error initializing window. Check system configurations and libraries");
+        throw std::runtime_error("Error initializing window. Check system configurations and libraries");
     }
 
     //idk just make the context current to make sure glfw operates on this window?
@@ -28,7 +27,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Cooked";
-        //throw std::system_error("Error initializing GLAD. Check system configurations and libraries");
+        throw std::runtime_error("Error initializing GLAD. Check system configurations and libraries");
     }
 
 
@@ -65,23 +64,25 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "uniform float aspectRatio;\n"
+    //tells the program how to draw the points
+    const char *vertexShaderSource = "#version 330 core\n"//type of OpeGL
+    "layout (location = 0) in vec3 aPos;\n" //where we are starting off I think idk
+    "uniform float aspectRatio;\n" //aspect ratio to adjust for different screen sizes
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x / aspectRatio, aPos.y, aPos.z, 1.0);\n"
+    "   gl_Position = vec4(aPos.x / aspectRatio, aPos.y, aPos.z, 1.0);\n" //drawing the position
     "}\0";
 
-    std::string fss = "#version 330 core\n"
+    //tells the program how to color the shapes
+    std::string fss = "#version 330 core\n"//type of OpenGL
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
     "   FragColor = vec4(" + 
-    std::to_string(oColor[0]) + "f, " +
-    std::to_string(oColor[1]) + "f, " +
-    std::to_string(oColor[2]) + "f, " +
-    std::to_string(oColor[3]) + "f);\n" +
+    std::to_string(oColor[0]) + "f, " + //R Value as a float
+    std::to_string(oColor[1]) + "f, " + //B Value as a float
+    std::to_string(oColor[2]) + "f, " + //G Value as a float
+    std::to_string(oColor[3]) + "f);\n" + //Alpha as a float
     "}\n\0";
 
     const char *fragmentShaderSource = fss.c_str();
@@ -105,6 +106,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int
 
     glLinkProgram(shaderProgram);
 
+    //find and account for aspect ration of screen
     aspectRatio = (float)width / (float)height;
     aspectRatioUniformLocation = glGetUniformLocation(shaderProgram, "aspectRatio");
 
@@ -132,9 +134,11 @@ bool Visualizer::render(const float* centers)
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
+    //create arrays to store the vertices and the order to draw the triangles
     float vertices[3 * (1 + precision) * numCircles];
     int order[3 * precision * numCircles];
 
+    //create the circles
     for(int i = 0; i < numCircles; i++)
     {
         make_circle(centers + 3 * i, vertices + 3 * (1 + precision) * i, order + 3 * precision * i, (precision + 1) * i);
@@ -149,14 +153,17 @@ bool Visualizer::render(const float* centers)
 
     //std::cout << vertices[12] << " " << vertices[13] << " " << vertices[14] << "\n";
 
+    //load the vertex data into the GPU
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
+    //load the order of the drawings into the GPU
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(order), order);
+
     //draw triangle
     glUseProgram(shaderProgram);
-    glUniform1f(aspectRatioUniformLocation, aspectRatio); 
+    glUniform1f(aspectRatioUniformLocation, aspectRatio); //account for aspect ratio
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3 * precision * numCircles, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -166,15 +173,17 @@ bool Visualizer::render(const float* centers)
     return true;
 }
 
+//makes an individual circle
 void Visualizer::make_circle(const float* center, float* vertices, int* order, int offset)
 {
+    //set the center of the circle as the first vertex (x,y,z)
     vertices[0] = center[0];
     vertices[1] = center[1];
     vertices[2] = 0.0f;
-    float pi_val = 3.15159276;
+    //Approximate circle by drawing a bunch of triangles from the center of the circle to the edges
     for(int i = 0; i < precision; i++)
     {
-        float angle = i * 2.0 * pi_val / precision;
+        float angle = i * 2.0 * std::numbers::pi_v<float> / precision;
         vertices[3 * (i + 1) + 0] = center[0] + radius * std::cos(angle);
         vertices[3 * (i + 1) + 1] = center[1] + radius * std::sin(angle);
         vertices[3 * (i + 1) + 2] = 0.0f;
