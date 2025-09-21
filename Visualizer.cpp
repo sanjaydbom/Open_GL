@@ -67,9 +67,10 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 
     const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "uniform float aspectRatio;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   gl_Position = vec4(aPos.x / aspectRatio, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
     std::string fss = "#version 330 core\n"
@@ -103,6 +104,9 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     glAttachShader(shaderProgram, fragmentShader);
 
     glLinkProgram(shaderProgram);
+
+    aspectRatio = (float)width / (float)height;
+    aspectRatioUniformLocation = glGetUniformLocation(shaderProgram, "aspectRatio");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -149,6 +153,7 @@ bool Visualizer::render(const float* center)
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(order), order);
     //draw triangle
     glUseProgram(shaderProgram);
+    glUniform1f(aspectRatioUniformLocation, aspectRatio); 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3 * precision, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

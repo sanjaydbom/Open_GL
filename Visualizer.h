@@ -18,6 +18,8 @@ class Visualizer
         float* backgroundColor;
         int precision = 50;
         float radius = 0.25f;
+        GLint aspectRatioUniformLocation;
+        float aspectRatio;
 };
 
 #endif
