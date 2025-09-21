@@ -12,7 +12,7 @@ class Visualizer
         bool render(const float* vertices, const int size);
     private:
         GLFWwindow* window;
-        unsigned int VBO, VAO;
+        unsigned int VBO, VAO, EBO;
         unsigned int shaderProgram;
         float* backgroundColor, objectColor;
 };

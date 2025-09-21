@@ -29,9 +29,15 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     }
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // Bottom-left vertex
-        0.5f, -0.5f, 0.0f, // Bottom-right vertex
-        0.0f,  0.5f, 0.0f // Top-middle vertex
+        0.5f, 0.5f, 0.0f, // Top-Right vertex
+        0.5f, -0.5f, 0.0f, // Bottom-Right vertex
+        -0.5f,  -0.5f, 0.0f, // Bottom-Left vertex
+        -0.5f, 0.5f, 0.0f // Top-Left vertex
+    };
+
+    unsigned int indices[] = {
+        0,1,3,
+        1,2,3
     };
 
     //Set up VAO
@@ -46,6 +52,11 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     //store the data-Static Draw is a way to draw the object, there are other ways depending on if it changes a lot or not
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 
     //we tell OpenGL how to interpret the data
     //First value is location of the vertex attributes. IDK what this means
@@ -124,11 +135,13 @@ bool Visualizer::render(const float* vertices, const int size)
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, size, vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     //draw triangle
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0 , 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     //swap buffers
     glfwSwapBuffers(window);
