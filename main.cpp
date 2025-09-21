@@ -3,7 +3,7 @@
 int main(){
     float bgColor[] = {0.0,0.0,0.0,1.0};
     float oColor[] = {1.0,1.0,1.0,1.0};
-    Visualizer GUI(800,600,bgColor, oColor);
+    Visualizer GUI(800,600,bgColor, oColor, 50, 2);
 
     float center[] = {
         0.0f, 0.0f, 0.0f,
@@ -12,7 +12,7 @@ int main(){
 
 
     std::cout << "Starting rendering\n";
-    while(GUI.render(center,2));
+    while(GUI.render(center));
     std::cout << "Rendering done\n";
     return 0;
 }

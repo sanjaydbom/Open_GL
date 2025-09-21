@@ -4,7 +4,7 @@
 #include <cmath>
 #include <numbers>
 
-Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
+Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int m_precision, int m_num_circles) : precision(m_precision), numCircles(m_num_circles)
 {
     //Initialize glfw
     glfwInit();
@@ -43,11 +43,11 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     //store the data-Static Draw is a way to draw the object, there are other ways depending on if it changes a lot or not
-    glBufferData(GL_ARRAY_BUFFER, 3 * (precision + 1) * sizeof(float) * 2, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3 * (precision + 1) * sizeof(float) * numCircles, nullptr, GL_DYNAMIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * (precision) * sizeof(int) * 2, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * (precision) * sizeof(int) * numCircles, nullptr, GL_DYNAMIC_DRAW);
 
 
     //we tell OpenGL how to interpret the data
@@ -116,7 +116,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 
 }
 
-bool Visualizer::render(const float* centers, int num_circles)
+bool Visualizer::render(const float* centers)
 {
     //std::cout << "Working\n";
     //check if window should be closed
@@ -132,10 +132,10 @@ bool Visualizer::render(const float* centers, int num_circles)
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
-    float vertices[3 * (1 + precision) * num_circles];
-    int order[3 * precision * num_circles];
+    float vertices[3 * (1 + precision) * numCircles];
+    int order[3 * precision * numCircles];
 
-    for(int i = 0; i < num_circles; i++)
+    for(int i = 0; i < numCircles; i++)
     {
         make_circle(centers + 3 * i, vertices + 3 * (1 + precision) * i, order + 3 * precision * i, (precision + 1) * i);
     }
@@ -158,7 +158,7 @@ bool Visualizer::render(const float* centers, int num_circles)
     glUseProgram(shaderProgram);
     glUniform1f(aspectRatioUniformLocation, aspectRatio); 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 3 * precision * num_circles, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 3 * precision * numCircles, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     //swap buffers
