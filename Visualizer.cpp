@@ -118,7 +118,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor, int
 
 }
 
-bool Visualizer::render(const float* centers)
+bool Visualizer::render(const float* centers, const float* radii)
 {
     //std::cout << "Working\n";
     //check if window should be closed
@@ -141,7 +141,7 @@ bool Visualizer::render(const float* centers)
     //create the circles
     for(int i = 0; i < numCircles; i++)
     {
-        make_circle(centers + 3 * i, vertices + 3 * (1 + precision) * i, order + 3 * precision * i, (precision + 1) * i);
+        make_circle(centers + 3 * i, vertices + 3 * (1 + precision) * i, order + 3 * precision * i, radii[i], (precision + 1) * i);
     }
     //std::cout << sizeof(vertices) / 3 / sizeof(vertices[0]) << " " << sizeof(order) / sizeof(int) / 3 << "\n";
     /*for(int i = 0; i < 3 * (precision); i++)
@@ -174,7 +174,7 @@ bool Visualizer::render(const float* centers)
 }
 
 //makes an individual circle
-void Visualizer::make_circle(const float* center, float* vertices, int* order, int offset)
+void Visualizer::make_circle(const float* center, float* vertices, int* order, const float radius, const int offset)
 {
     //set the center of the circle as the first vertex (x,y,z)
     vertices[0] = center[0];
