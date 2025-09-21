@@ -1,5 +1,8 @@
+#define _USE_MATH_DEFINES
 #include "Visualizer.h"
 #include <stdexcept>
+#include <cmath>
+#include <numbers>
 
 Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 {
@@ -28,17 +31,6 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
         //throw std::system_error("Error initializing GLAD. Check system configurations and libraries");
     }
 
-    float vertices[] = {
-        0.5f, 0.5f, 0.0f, // Top-Right vertex
-        0.5f, -0.5f, 0.0f, // Bottom-Right vertex
-        -0.5f,  -0.5f, 0.0f, // Bottom-Left vertex
-        -0.5f, 0.5f, 0.0f // Top-Left vertex
-    };
-
-    unsigned int indices[] = {
-        0,1,3,
-        1,2,3
-    };
 
     //Set up VAO
     //VAO is configuration data
@@ -51,11 +43,11 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     //store the data-Static Draw is a way to draw the object, there are other ways depending on if it changes a lot or not
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3 * (precision + 1) * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * (precision) * sizeof(int), nullptr, GL_DYNAMIC_DRAW);
 
 
     //we tell OpenGL how to interpret the data
@@ -70,6 +62,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 
     //Unbind VAO and VBO to prevent accidental changes
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     const char *vertexShaderSource = "#version 330 core\n"
@@ -119,7 +112,7 @@ Visualizer::Visualizer(int width, int height, float* bgColor, float* oColor)
 
 }
 
-bool Visualizer::render(const float* vertices, const int size)
+bool Visualizer::render(const float* center)
 {
     //std::cout << "Working\n";
     //check if window should be closed
@@ -135,15 +128,54 @@ bool Visualizer::render(const float* vertices, const int size)
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);//R,G,B,Alpha-how transparent it is
     glClear(GL_COLOR_BUFFER_BIT);
 
+    float vertices[3 * (1 + precision)];
+    int order[3 * precision];
+
+    make_circle(center, vertices, order);
+
+    /*for(int i = 0; i < 3 * (precision); i++)
+    {
+        if((i+1) % 3 == 0)
+            std::cout << order[i] << "\n";
+        else std::cout << order[i] << " ";
+    }*/
+
+    //std::cout << vertices[12] << " " << vertices[13] << " " << vertices[14] << "\n";
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, size, vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(order), order);
     //draw triangle
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 3 * precision, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     //swap buffers
     glfwSwapBuffers(window);
     return true;
+}
+
+void Visualizer::make_circle(const float* center, float* vertices, int* order)
+{
+    vertices[0] = center[0];
+    vertices[1] = center[1];
+    vertices[2] = 0.0f;
+    float pi_val = 3.15159276;
+    for(int i = 0; i < precision; i++)
+    {
+        float angle = i * 2.0 * pi_val / precision;
+        vertices[3 * (i + 1) + 0] = center[0] + radius * std::cos(angle);
+        vertices[3 * (i + 1) + 1] = center[1] + radius * std::sin(angle);
+        vertices[3 * (i + 1) + 2] = 0.0f;
+    }
+    
+    for(int i = 0; i < precision; i++)
+    {
+        order[3 * i + 0] = 0;
+        order[3 * i + 1] = i + 1;
+        order[3 * i + 2] = (i + 1) % precision + 1;
+    }
 }

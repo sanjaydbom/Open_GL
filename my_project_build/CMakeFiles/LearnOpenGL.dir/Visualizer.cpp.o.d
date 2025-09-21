@@ -794,4 +794,5 @@ CMakeFiles/LearnOpenGL.dir/Visualizer.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/unistd.h \
   /Users/sanjay/Desktop/Open_GL/libraries/glad/glad.h \
   /Users/sanjay/Desktop/Open_GL/libraries/KHR/khrplatform.h \
-  /Users/sanjay/Desktop/Open_GL/libraries/glfw/include/GLFW/glfw3.h
+  /Users/sanjay/Desktop/Open_GL/libraries/glfw/include/GLFW/glfw3.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/numbers
